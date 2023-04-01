@@ -1,6 +1,8 @@
 import sys
 from collections import Counter, defaultdict
+
 from ..utils.printing import hhistplot
+
 
 class PartitionedHistogram:
     ID = "partitionedhistogram"
@@ -16,16 +18,19 @@ class PartitionedHistogram:
 
     @staticmethod
     def register(parser):
-        parser.add_argument("--" + PartitionedHistogram.ID, nargs = 3,
-                            metavar = ("jmp_threshold", "peak_s", "outlier_s"),
-                            help = "TODO.")
+        parser.add_argument(
+            "--" + PartitionedHistogram.ID,
+            nargs=3,
+            metavar=("jmp_threshold", "peak_s", "outlier_s"),
+            help="TODO.",
+        )
 
     @staticmethod
     def from_parse(params):
         return PartitionedHistogram(*map(float, params))
 
     @staticmethod
-    def add(counters, sizes,  x):
+    def add(counters, sizes, x):
         key, val = x[0], x[1:]
         counters[key][val] += 1
         sizes[key] += 1
@@ -47,7 +52,9 @@ class PartitionedHistogram:
 
     @staticmethod
     def PeakProps(ys):
-        delta, min_hi, max_low, start_hi = max((ys[i+1] / ys[i], ys[i+1], ys[i], i+1) for i in range(len(ys) - 1))
+        delta, min_hi, max_low, start_hi = max(
+            (ys[i + 1] / ys[i], ys[i + 1], ys[i], i + 1) for i in range(len(ys) - 1)
+        )
         return delta, min_hi, max_low, start_hi
 
     @staticmethod
@@ -61,20 +68,29 @@ class PartitionedHistogram:
             # if len(ys) > 3:
             #     print(ys)
             #     print(delta, min_hi, max_low, start_hi, sum_low, sum_hi)
-            return (delta > jmp_threshold and
-                    sum_hi > peak_threshold * (sum_hi + sum_low))
+            return delta > jmp_threshold and sum_hi > peak_threshold * (
+                sum_hi + sum_low
+            )
 
     def finish_fit(self):
         self.all_counters = self.counters
-        self.counters = tuple({k: vs for (k, vs)
-                               in counters.items()
-                               if PartitionedHistogram.IsPeaked(vs, self.jmp_threshold, self.peak_threshold)}
-                              for counters in self.counters)
+        self.counters = tuple(
+            {
+                k: vs
+                for (k, vs) in counters.items()
+                if PartitionedHistogram.IsPeaked(
+                    vs, self.jmp_threshold, self.peak_threshold
+                )
+            }
+            for counters in self.counters
+        )
         # from pprint import pprint
         # pprint(self.all_counters)
 
     def find_discrepancies_in_features(self, field_id, features, discrepancies):
-        for feature_id, (xi, mi, si) in enumerate(zip(features, self.counters, self.sizes)):
+        for feature_id, (xi, mi, si) in enumerate(
+            zip(features, self.counters, self.sizes)
+        ):
             k, v = xi[0], xi[1:]
             mi, si = mi.get(k, None), si[k]
             if mi != None and mi.get(v, 0) < self.outlier_threshold * si:
@@ -85,15 +101,17 @@ class PartitionedHistogram:
         self.find_discrepancies_in_features(0, X[0], discrepancies)
         return discrepancies
 
-    def more_info(self, discrepancy, description, X, indent = "", pipe = sys.stdout):
-        assert(len(discrepancy) == 1)
+    def more_info(self, discrepancy, description, X, indent="", pipe=sys.stdout):
+        assert len(discrepancy) == 1
         field_id, feature_id = discrepancy[0]
-        assert(field_id == 0)
+        assert field_id == 0
         xi = X[0][feature_id]
         key, val = xi[0], xi[1:]
         kdesc, vdesc = description[0], description[1:]
         histograms = self.all_counters[feature_id]
-        pipe.write(indent + "• histogram for {} if '{}' = {}:\n".format(vdesc, kdesc, key))
+        pipe.write(
+            indent + "• histogram for {} if '{}' = {}:\n".format(vdesc, kdesc, key)
+        )
         hhistplot(histograms[key], val, indent + "  ", pipe)
 
         if len(histograms) > 1:

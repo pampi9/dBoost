@@ -1,21 +1,27 @@
 #! /usr/bin/env python3
+import sys
+import timeit
+from itertools import chain
+
 from .utils import tupleops
 from .utils.printing import debug
-from itertools import chain
-import timeit,sys
+
 
 def expand_field(f, rules):
     rls = rules[type(f)]
     return tuple(chain.from_iterable(rule(f) for rule in rls))
 
+
 def expand(x, rules):
     return tuple(expand_field(f, rules) for f in x)
+
 
 def expand_hints(X, hints):
     expanded_hints = tupleops.deepmap(lambda h: X[h[0]][h[1]], hints)
     return (expanded_hints,) + X
 
-def expand_stream(generator, rules, keep_x, hints, maxrecords = float("+inf")):
+
+def expand_stream(generator, rules, keep_x, hints, maxrecords=float("+inf")):
     for idx, x in enumerate(generator()):
         if idx >= maxrecords:
             break
@@ -24,7 +30,16 @@ def expand_stream(generator, rules, keep_x, hints, maxrecords = float("+inf")):
             X = expand_hints(X, hints)
         yield (x, X) if keep_x else X
 
-def outliers(trainset_generator, testset_generator, analyzer, model, rules,runtime_progress, maxrecords = float("+inf")):
+
+def outliers(
+    trainset_generator,
+    testset_generator,
+    analyzer,
+    model,
+    rules,
+    runtime_progress,
+    maxrecords=float("+inf"),
+):
     start = timeit.default_timer()
     debug(">> Finding correlations")
 
@@ -33,15 +48,19 @@ def outliers(trainset_generator, testset_generator, analyzer, model, rules,runti
 
     debug(">> Building model...")
     analyzer.expand_stats()
-    model.fit(expand_stream(trainset_generator, rules, False, analyzer.hints, maxrecords), analyzer)
+    model.fit(
+        expand_stream(trainset_generator, rules, False, analyzer.hints, maxrecords),
+        analyzer,
+    )
 
     debug(">> Finding outliers...")
-    for index, (x, X) in enumerate(expand_stream(testset_generator, rules,
-                                                 True, analyzer.hints, maxrecords)):
+    for index, (x, X) in enumerate(
+        expand_stream(testset_generator, rules, True, analyzer.hints, maxrecords)
+    ):
         discrepancies = model.find_discrepancies(X, index)
         if len(discrepancies) > 0:
             yield index, (x, X, discrepancies)
         if index % runtime_progress == 0:
-            debug("Time {} {}".format(index,timeit.default_timer()-start))
+            debug("Time {} {}".format(index, timeit.default_timer() - start))
     stop = timeit.default_timer()
-    debug("Runtime ",stop-start)
+    debug("Runtime ", stop - start)

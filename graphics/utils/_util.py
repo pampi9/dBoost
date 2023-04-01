@@ -1,10 +1,10 @@
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 
 import functools
+import numbers
 import operator
 import sys
 import warnings
-import numbers
 
 import numpy as np
 
@@ -20,16 +20,16 @@ def _aligned_zeros(shape, dtype=float, order="C", align=None):
     dtype = np.dtype(dtype)
     if align is None:
         align = dtype.alignment
-    if not hasattr(shape, '__len__'):
+    if not hasattr(shape, "__len__"):
         shape = (shape,)
     size = functools.reduce(operator.mul, shape) * dtype.itemsize
     buf = np.empty(size + align + 1, np.uint8)
-    offset = buf.__array_interface__['data'][0] % align
+    offset = buf.__array_interface__["data"][0] % align
     if offset != 0:
         offset = align - offset
     # Note: slices producing 0-size arrays do not necessarily change
     # data pointer --- so we use and allocate size+1
-    buf = buf[offset:offset+size+1][:-1]
+    buf = buf[offset : offset + size + 1][:-1]
     data = np.ndarray(shape, dtype, buf, order=order)
     data.fill(0)
     return data
@@ -63,9 +63,11 @@ class DeprecatedImport(object):
         return dir(self._mod)
 
     def __getattr__(self, name):
-        warnings.warn("Module %s is deprecated, use %s instead"
-                      % (self._old_name, self._new_name),
-                      DeprecationWarning)
+        warnings.warn(
+            "Module %s is deprecated, use %s instead"
+            % (self._old_name, self._new_name),
+            DeprecationWarning,
+        )
         return getattr(self._mod, name)
 
 
@@ -73,7 +75,7 @@ class DeprecatedImport(object):
 def check_random_state(seed):
     """Turn seed into a np.random.RandomState instance
 
-    If seed is None (or np.random), return the RandomState singleton used 
+    If seed is None (or np.random), return the RandomState singleton used
     by np.random.
     If seed is an int, return a new RandomState instance seeded with seed.
     If seed is already a RandomState instance, return it.
@@ -85,5 +87,6 @@ def check_random_state(seed):
         return np.random.RandomState(seed)
     if isinstance(seed, np.random.RandomState):
         return seed
-    raise ValueError('%r cannot be used to seed a numpy.random.RandomState'
-                     ' instance' % seed)
+    raise ValueError(
+        "%r cannot be used to seed a numpy.random.RandomState" " instance" % seed
+    )

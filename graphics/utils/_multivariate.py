@@ -1,14 +1,14 @@
 #
 # Author: Joris Vankerschaver 2013
 #
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import scipy.linalg
 from scipy.misc import doccer
-from scipy.special import gammaln, psi, multigammaln
-from ._util import check_random_state
+from scipy.special import gammaln, multigammaln, psi
 
+from ._util import check_random_state
 
 __all__ = ['multivariate_normal', 'dirichlet', 'wishart', 'invwishart']
 
@@ -1665,9 +1665,11 @@ for name in ['logpdf', 'pdf', 'mean', 'mode', 'var', 'rvs', 'entropy']:
     method.__doc__ = doccer.docformat(method.__doc__, wishart_docdict_params)
 
 
-from numpy import asarray_chkfinite, asarray
-from scipy.linalg.misc import LinAlgError
+from numpy import asarray, asarray_chkfinite
 from scipy.linalg.lapack import get_lapack_funcs
+from scipy.linalg.misc import LinAlgError
+
+
 def _cho_inv_batch(a, check_finite=True):
     """
     Invert the matrices a_i, using a Cholesky factorization of A, where

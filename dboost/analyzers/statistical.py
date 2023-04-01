@@ -17,10 +17,12 @@ Public members:
 
 """
 
-from numbers import Number
 from math import fabs
-from ..utils.tupleops import defaultif_masked, deepapply_masked, pair_ids, make_mask_abc
+from numbers import Number
+
 from ..analyzers.utils import Stats
+from ..utils.tupleops import deepapply_masked, defaultif_masked, make_mask_abc, pair_ids
+
 
 class Pearson:
     ID = "statistical"
@@ -36,10 +38,14 @@ class Pearson:
 
     @staticmethod
     def register(parser):
-        parser.add_argument("--" + Pearson.ID, nargs = 1, metavar = "epsilon",
-                            help = "Use a statistical model analyzer, " +
-                            "reporting correlated values with a pearson r" +
-                            "value greater than epsilon.")
+        parser.add_argument(
+            "--" + Pearson.ID,
+            nargs=1,
+            metavar="epsilon",
+            help="Use a statistical model analyzer, "
+            + "reporting correlated values with a pearson r"
+            + "value greater than epsilon.",
+        )
 
     @staticmethod
     def from_parse(params):
@@ -47,8 +53,9 @@ class Pearson:
 
     def pearson(self, pair_id):
         (idx, sidx), (idy, sidy) = pair_id
-        return Stats.pearson(self.stats[idx][sidx], self.stats[idy][sidy],
-                             self.pairwise_prods[pair_id])
+        return Stats.pearson(
+            self.stats[idx][sidx], self.stats[idy][sidy], self.pairwise_prods[pair_id]
+        )
 
     def fit(self, Xs):
         for X in Xs:
@@ -61,7 +68,7 @@ class Pearson:
             if self.pairwise_prods == None:
                 self.pairwise_prods = {pid: 0 for pid in pair_ids(X, self.mask)}
 
-            for (id1, id2) in self.pairwise_prods:
+            for id1, id2 in self.pairwise_prods:
                 (idx, sidx), (idy, sidy) = id1, id2
                 self.pairwise_prods[(id1, id2)] += X[idx][sidx] * X[idy][sidy]
 

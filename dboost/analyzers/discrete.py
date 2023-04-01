@@ -1,14 +1,16 @@
+import sys
 from collections import Counter
 from itertools import combinations
+
 from ..utils import tupleops
 from ..utils.printing import debug
-import sys
+
 
 class DiscreteStats:
     ID = "discretestats"
 
     def __init__(self, max_buckets, fundep_size):
-        assert(fundep_size >= 1)
+        assert fundep_size >= 1
         self.max_buckets = max_buckets
         self.fundep_size = fundep_size
         self.histograms = None
@@ -17,21 +19,27 @@ class DiscreteStats:
 
     @staticmethod
     def register(parser):
-        parser.add_argument("--" + DiscreteStats.ID, nargs = 2, metavar = ("max_buckets", "fundep_size"),
-                            help = "Find correlations using discrete histograms to count occurences of subtuples. Considers subtuples of size fundep_size, histograms are only retained if they total less than max_buckets distinct classes.")
+        parser.add_argument(
+            "--" + DiscreteStats.ID,
+            nargs=2,
+            metavar=("max_buckets", "fundep_size"),
+            help="Find correlations using discrete histograms to count occurences of subtuples. Considers subtuples of size fundep_size, histograms are only retained if they total less than max_buckets distinct classes.",
+        )
 
     @staticmethod
     def from_parse(params):
         return DiscreteStats(*(int(param) for param in params))
 
     def fit(self, Xs):
-        for (Xnum, X) in enumerate(Xs):
+        for Xnum, X in enumerate(Xs):
             if Xnum % 10 == 0 and sys.stdout.isatty():
-                debug(Xnum, end='\r')
+                debug(Xnum, end="\r")
 
             if self.histograms == None:
                 # types = tupleops.extract_types(X)
-                self.histograms = {k: Counter() for k in tupleops.subtuple_ids(X, self.fundep_size)}
+                self.histograms = {
+                    k: Counter() for k in tupleops.subtuple_ids(X, self.fundep_size)
+                }
 
             # if not tupleops.types_consistent(types, X):
             #     print("line", Xnum, "has inconsistent types")
@@ -55,4 +63,4 @@ class DiscreteStats:
         self.hints = tuple(self.histograms.keys())
 
     def expand_stats(self):
-        pass # This analyzer does not actually product stats
+        pass  # This analyzer does not actually product stats

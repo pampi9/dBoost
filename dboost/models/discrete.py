@@ -1,8 +1,10 @@
 import collections
-import sys
 import heapq
+import sys
+
 from ..utils import tupleops
 from ..utils.printing import hhistplot
+
 
 class Histogram:
     ID = "histogram"
@@ -18,12 +20,15 @@ class Histogram:
 
     @staticmethod
     def register(parser):
-        parser.add_argument("--" + Histogram.ID, nargs = 2,
-                            metavar = ("peak_s", "outlier_s"),
-                            help = "Use a discrete histogram-based model, identifying fields that" +
-                            "have a peaked distribution (peakiness is determined using the peak_s " +
-                            "parameter), and reporting values that fall in classes totaling less than "
-                            "outlier_s of the corresponding histogram. Suggested values: 0.8 0.2.")
+        parser.add_argument(
+            "--" + Histogram.ID,
+            nargs=2,
+            metavar=("peak_s", "outlier_s"),
+            help="Use a discrete histogram-based model, identifying fields that"
+            + "have a peaked distribution (peakiness is determined using the peak_s "
+            + "parameter), and reporting values that fall in classes totaling less than "
+            "outlier_s of the corresponding histogram. Suggested values: 0.8 0.2.",
+        )
 
     @staticmethod
     def from_parse(params):
@@ -39,11 +44,11 @@ class Histogram:
 
     @staticmethod
     def NbPeaks(distribution):
-        return max(1, min(3, len(distribution) // 2)) # TODO
+        return max(1, min(3, len(distribution) // 2))  # TODO
 
     @staticmethod
     def IsPeaked(distribution, peak_threshold):
-        if distribution is None or len(distribution) > Histogram.MAX_HIST_SIZE: # TODO
+        if distribution is None or len(distribution) > Histogram.MAX_HIST_SIZE:  # TODO
             return False
         else:
             nb_peaks = Histogram.NbPeaks(distribution)
@@ -68,13 +73,19 @@ class Histogram:
 
     def finish_fit(self):
         self.all_counters = self.counters
-        self.counters = tupleops.merge(self.counters, self.counters, self.is_peaked, tupleops.keep_if)
+        self.counters = tupleops.merge(
+            self.counters, self.counters, self.is_peaked, tupleops.keep_if
+        )
 
-    def find_discrepancies_in_features(self, field_id, features, counters, sizes, discrepancies):
+    def find_discrepancies_in_features(
+        self, field_id, features, counters, sizes, discrepancies
+    ):
         for feature_id, (xi, mi, si) in enumerate(zip(features, counters, sizes)):
-            if mi == None: # Histogram discarded (too large)
+            if mi == None:  # Histogram discarded (too large)
                 continue
-            if mi.get(xi, 0) < self.outlier_threshold * si: # si is the total size of the histogram
+            if (
+                mi.get(xi, 0) < self.outlier_threshold * si
+            ):  # si is the total size of the histogram
                 discrepancies.append(((field_id, feature_id),))
 
     def find_discrepancies(self, X, _):
@@ -86,13 +97,14 @@ class Histogram:
 
         # Only look at correlated columns if row already passes simpler tests
         if len(discrepancies) == 0:
-            self.find_discrepancies_in_features(0, X[0], self.counters[0],
-                                                self.sizes[0], discrepancies)
+            self.find_discrepancies_in_features(
+                0, X[0], self.counters[0], self.sizes[0], discrepancies
+            )
 
         return discrepancies
 
-    def more_info(self, discrepancy, description, X, indent = "", pipe = sys.stdout):
-        assert(len(discrepancy) == 1)
+    def more_info(self, discrepancy, description, X, indent="", pipe=sys.stdout):
+        assert len(discrepancy) == 1
         field_id, feature_id = discrepancy[0]
         highlighted = X[field_id][feature_id]
         counter = self.all_counters[field_id][feature_id]

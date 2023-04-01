@@ -1,5 +1,7 @@
-import utils
 import os
+
+import utils
+
 
 def load_country_data():
     """Loads a list of [Country, Capital, Currency name, Currency symbol]"""
@@ -9,5 +11,6 @@ def load_country_data():
             line = line.strip().lower().split("\t")
             lines.append(tuple(line))
     return lines
+
 
 COUNTRY_DATA = load_country_data()

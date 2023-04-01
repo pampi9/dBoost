@@ -1,6 +1,6 @@
-from .gaussian import Simple
 from .discrete import Histogram
-from .mixture import Mixture
 from .discretepart import PartitionedHistogram
+from .gaussian import Simple
+from .mixture import Mixture
 
 ALL = lambda: (Simple, Histogram, Mixture, PartitionedHistogram)

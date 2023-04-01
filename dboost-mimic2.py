@@ -1,13 +1,17 @@
 #! /usr/bin/env python3
 import sqlite3
 import sys
+
+import cli
+import features
 from utils import db
 from utils.printing import print_rows
-import dboost
-import features
-import cli
 
-TABLES = [line.strip() for line in """
+import dboost
+
+TABLES = [
+    line.strip()
+    for line in """
 db_schema
 d_chartitems_detail
 d_parammap_items
@@ -46,11 +50,13 @@ poe_med
 ioevents
 labevents
 chartevents
-""".splitlines() if line != ""]
+""".splitlines()
+    if line != ""
+]
 
 COUNT = "SELECT COUNT(*) FROM {}"
 QUERY = "SELECT * FROM {}"
-#PATH = "/afs/csail.mit.edu/group/db/6830/mimic2.db"
+# PATH = "/afs/csail.mit.edu/group/db/6830/mimic2.db"
 
 parser = cli.get_mimic_parser()
 args, models, rules = cli.parsewith(parser)
@@ -72,11 +78,13 @@ for table in TABLES:
 
             print("... {} found".format(len(outliers)))
             if 0 < len(outliers) < 200:
-                print_rows(outliers, model, features.descriptions(rules), args.verbosity)
+                print_rows(
+                    outliers, model, features.descriptions(rules), args.verbosity
+                )
 
     print()
 
-# Relevant strategies: 
+# Relevant strategies:
 # * Get a histogram of the data instead of assuming it's gaussian
 #
 # Extra features

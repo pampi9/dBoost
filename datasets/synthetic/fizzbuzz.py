@@ -7,10 +7,12 @@ MAX = 1000
 OUTPUT = "fizzbuzz"
 FORMAT = "{}\t{}\n"
 
+
 def writeout(output, num, msg):
     output.write(FORMAT.format(num, msg))
 
-with open(utils.abspath(OUTPUT), mode = "w") as output:
+
+with open(utils.abspath(OUTPUT), mode="w") as output:
     for num in range(MAX + 1):
         three = (num % 3) == 0
         five = (num % 5) == 0

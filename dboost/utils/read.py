@@ -1,17 +1,21 @@
+import csv
+import sys
+
 from .autoconv import autoconv
 from .printing import debug
-import sys, csv
+
 
 def parse_line_blind(row, floats_only):
     return tuple(autoconv(field, floats_only) for field in row)
 
-def stream_tuples(input, fs, floats_only, preload, maxrecords = float("+inf")):
+
+def stream_tuples(input, fs, floats_only, preload, maxrecords=float("+inf")):
     def stream():
         if stream.call_count > 0:
             input.seek(0)
         stream.call_count += 1
 
-        for rid, row in enumerate(csv.reader(input, delimiter = fs)):
+        for rid, row in enumerate(csv.reader(input, delimiter=fs)):
             if rid > maxrecords:
                 break
 
@@ -42,6 +46,6 @@ def stream_tuples(input, fs, floats_only, preload, maxrecords = float("+inf")):
 
     if preload:
         dataset = list(stream())
-        return (lambda: dataset)
+        return lambda: dataset
     else:
         return stream
