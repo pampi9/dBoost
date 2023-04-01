@@ -1,0 +1,19 @@
+# Create venv folder
+
+`virtualenv venv`
+
+# Activate
+
+`source venv/bin/activate`
+
+# Install requirements
+
+`pip install -r requirements.txt`
+
+# Deactivate
+
+`deactivate`
+
+# Run tests
+
+`python3 -m pytest --html=report.html --self-contained-html`

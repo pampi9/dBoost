@@ -1,0 +1,23 @@
+{
+    "files.autoSave": "afterDelay",
+    "editor.formatOnSave": false,
+    "[python]": {
+        "editor.formatOnSave": true,
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.organizeImports": true,
+        "source.sortMembers": true
+    },
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "/home/franci/.local/bin/black",
+    "autoDocstring.docstringFormat": "sphinx",
+    "autoDocstring.startOnNewLine": true,
+    "autoDocstring.guessTypes": false,
+    "autoDocstring.includeExtendedSummary": false,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
