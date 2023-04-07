@@ -16,4 +16,9 @@
 
 # Run tests
 
-`python3 -m pytest --html=report.html --self-contained-html`
+`python3 -m pytest --html=build/pytest/report.html --self-contained-html`
+
+# Run coverage
+
+`python3 -m coverage run --source dboost --branch -m pytest`
+`python3 -m coverage html -d build/coverage`

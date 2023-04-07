@@ -36,5 +36,6 @@ __pycache__/
 # Project files
 /.ropeproject/
 
-# pyTest report
-report.html
+# pyTest/coverage report
+.coverage
+build

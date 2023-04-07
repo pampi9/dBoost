@@ -4,9 +4,19 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "pyTest",
+            "label": "pytest",
             "type": "shell",
-            "command": "python3 -m pytest --html=report.html --self-contained-html"
+            "command": "python3 -m pytest --html=build/pytest/report.html --self-contained-html"
+        },
+        {
+            "label": "coverage",
+            "type": "shell",
+            "command": "python3 -m coverage run --source dboost --branch -m pytest tests && python3 -m coverage html -d build/coverage"
+        },
+        {
+            "label": "uml",
+            "type": "shell",
+            "command": "pyreverse dboost && dot -Tpng classes.dot > classes.png && dot -Tpng packages.dot > packages.png"
         }
     ]
 }
