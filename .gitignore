@@ -39,3 +39,9 @@ __pycache__/
 # pyTest/coverage report
 .coverage
 build
+
+# uml
+packages.png
+packages.dot
+classes.png
+classes.dot
