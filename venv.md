@@ -21,4 +21,5 @@
 # Run coverage
 
 `python3 -m coverage run --source dboost --branch -m pytest`
+
 `python3 -m coverage html -d build/coverage`
