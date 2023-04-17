@@ -49,11 +49,16 @@ for model in models:
         if len(outliers) == 0:
             debug("   All clean!")
         else:
-            print_rows(
+            output = print_rows(
                 outliers,
                 model,
                 analyzer.hints,
                 features.descriptions(rules),
                 args.verbosity,
             )
+            for bloc in output:
+                for line in bloc:
+                    pass
+                    # print(line)
+                # sys.stdout.write("\n".join(bloc))
             debug("   {} outliers found".format(len(outliers)))

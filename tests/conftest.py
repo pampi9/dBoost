@@ -1,15 +1,11 @@
-import os
 import pathlib
-import random
 import sys
-from datetime import datetime
 
 import pytest
 from py.xml import html
 
-sys.path.append(pathlib.Path(__file__).parents[2])
+sys.path.append(str(pathlib.Path(__file__).parents[2]))
 
-import dboost
 from dboost.features import rules
 
 

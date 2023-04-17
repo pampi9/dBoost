@@ -1,8 +1,12 @@
 import bisect
 import os
 import sys
+from io import StringIO
 
 from . import color
+
+
+std_out = StringIO()
 
 
 def debug(*args, **kwargs):
@@ -47,11 +51,44 @@ def describe_discrepancy(fields_group, rules_descriptions, hints, x):
     return msg, features
 
 
+def store_result(outliers, model, hints, rules_descriptions):
+    features = []
+    for linum, (x, X, discrepancies) in outliers:
+        for fields_group in discrepancies:
+            output = {"from": None, "to": None}
+            ((field_id1, feature_id1), (field_id2, feature_id2)) = expand_hints(fields_group, hints)
+            for field_id, feature_id in [(field_id1, feature_id1), (field_id2, feature_id2)]:
+                histograms = {}
+                for value, hist in model.all_counters[feature_id].items():
+                    if value not in histograms:
+                        histograms[value] = []
+                    histograms[value].append(hist)
+                output["from" if output["from"] is None else "to"] = {
+                    "field_id": field_id,
+                    "rule": rules_descriptions[type(x[field_id])][feature_id],
+                    "hist": histograms
+                }
+            if output["from"]["field_id"] == 3 and output["to"]["field_id"] == 4:
+                if output["from"]["rule"] == "empty" and output["to"]["rule"] == "strp":
+                    pass
+                    # print("EXPANDED", output)
+                if output["from"]["rule"] == "is digit" and output["to"]["rule"] == "strp":
+                    print("EXPANDED", output)
+            features.append(output)
+    exit()
+    for feature in features:
+        print(feature)
+    exit()
+
+
 def print_rows(
     outliers, model, hints, rules_descriptions, verbosity=0, max_w=40, header="   "
 ):
+    # store_result(outliers, model, hints, rules_descriptions)
     if len(outliers) == 0:
         return
+
+    output = []
 
     # each outlier is (x, X, discrepancies)
     nb_fields = len(outliers[0][1][0])
@@ -62,6 +99,7 @@ def print_rows(
         widths = tuple(max(w, min(max_w, len(str(f)))) for w, f in zip(widths, x))
 
     for linum, (x, X, discrepancies) in outliers:
+        output_discrepancy = []
         highlight = [
             field_id
             for fields_group in discrepancies
@@ -74,21 +112,33 @@ def print_rows(
         colorized_x = " ".join(f + " " * p for f, p in zip(colorized_x, padding))
 
         if verbosity < 0:
-            sys.stdout.write(str(linum) + "\n")
+            output_discrepancy.append(str(linum))
+            # sys.stdout.write(str(linum) + "\n")
         else:
-            sys.stdout.write(header + colorized_x + "\n")
+            output_discrepancy.append(header + colorized_x)
+            # sys.stdout.write(header + colorized_x + "\n")
 
             if verbosity > 0:
                 for fields_group in discrepancies:
                     msg, features_desc = describe_discrepancy(
                         fields_group, rules_descriptions, hints, x
                     )
-                    sys.stdout.write(msg + "\n")
+                    output_discrepancy.append(msg)
+                    # sys.stdout.write(msg + "\n")
 
                     if verbosity > 1:
-                        model.more_info(fields_group, features_desc, X, "     ")
-
-                sys.stdout.write("\n")
+                        model.more_info(
+                            discrepancy=fields_group,
+                            description=features_desc,
+                            X=X,
+                            indent="     ",
+                            # pipe=std_out,
+                        )
+                        # std_out.write("\n\n")
+                output_discrepancy.append(std_out.getvalue())
+                # sys.stdout.write("\n")
+            output.append(output_discrepancy)
+    return output
 
 
 def colorize(row, indices):

@@ -1,5 +1,6 @@
 import csv
 import sys
+import time
 
 from .autoconv import autoconv
 from .printing import debug
@@ -19,26 +20,26 @@ def stream_tuples(input, fs, floats_only, preload, maxrecords=float("+inf")):
             if rid > maxrecords:
                 break
 
-            if stream.row_length == None:
+            if stream.row_length is None:
                 stream.row_length = len(row)
             elif len(row) != stream.row_length:
                 sys.stderr.write("Discarding {} (invalid length)\n".format(row))
                 continue
 
-            if stream.types == None:
+            if stream.call_count == 1 and rid == 0 and stream.row_length == 1:
+                debug("Your dataset seems to have only one column. Did you need -F?")
+
+            if stream.types is None:
                 row = parse_line_blind(row, floats_only)
                 stream.types = tuple(map(type, row))
+                sys.stdout.write(f"stream.types = {stream.types}")
             else:
                 try:
                     row = tuple(conv(field) for conv, field in zip(stream.types, row))
                 except ValueError:
                     sys.stderr.write("Discarding {} (invalid types)\n".format(row))
                     continue
-
-            if stream.call_count == 1 and rid == 0 and stream.row_length == 1:
-                debug("Your dataset seems to have only one column. Did you need -F?")
-
-            yield row
+                yield row
 
     stream.call_count = 0
     stream.types = None
