@@ -1,6 +1,7 @@
 import pytest
 
-from dboost import expand_field
+from dboost import expand_field, expand, expand_hints, expand_stream
+from dboost.utils.read import stream_tuples
 
 
 @pytest.mark.parametrize(
@@ -100,5 +101,134 @@ from dboost import expand_field
 )
 def test_fct__expand_field(field, field_expanded, expansion_rules):
     test_fct__expand_field.__test_type__ = "fct"
-    print(expand_field(field, expansion_rules))
     assert expand_field(field, expansion_rules) == field_expanded
+
+
+def test_fct__expand(expansion_rules):
+    assert expand(["Test", "my value,01", 123], expansion_rules) == (
+        (
+            False,
+            False,
+            True,
+            False,
+            4,
+            "Lu,Ll,Ll,Ll",
+            "Test",
+            False,
+            "NONE",
+            "Test",
+            False,
+        ),
+        (
+            False,
+            True,
+            False,
+            False,
+            11,
+            "Ll,Ll,Zs,Ll,Ll,Ll,Ll,Ll,Po,Nd,Nd",
+            "my value,<num>",
+            False,
+            "NONE",
+            "my value,01",
+            False,
+        ),
+        (123, None, 1970, 1, 1, 0, 2, 3, 3, 1, False, 1, 1, 0, 1, 1, 1, True, False, 3),
+    )
+
+
+def test_fct__expand_hints():
+    assert expand_hints((("ABC", "DEF"), (123, 456)), hints=[((0, 0), (1, 0))]) == (
+        (("ABC", 123),),
+        ("ABC", "DEF"),
+        (123, 456),
+    )
+
+
+@pytest.mark.parametrize(
+    ("csv_input", "separator", "floats_only", "maxrecords", "hints", "expected_output"),
+    [
+        (
+            ["ABC\t123\t120.2", "ABC\t123\t120.2", "DEF\t123\t120.2"],
+            "\t",
+            True,
+            1,
+            [((0, 0), (1, 0))],
+            [
+                (
+                    ("ABC", 123.0, 120.2),
+                    (
+                        ((True, 123.0),),
+                        (
+                            True,
+                            False,
+                            False,
+                            False,
+                            3,
+                            "Lu,Lu,Lu",
+                            "ABC",
+                            False,
+                            "NONE",
+                            "ABC",
+                            False,
+                        ),
+                        (123.0, 1970, 1, 1, 0, 2, 3, 3, 1, 0.0),
+                        (120.2, 1970, 1, 1, 0, 2, 0, 3, 1, 0.20000000000000284),
+                    ),
+                ),
+            ],
+        ),
+        (
+            ["ABC\t123\t120.2", "ABC\t123\t120.2", "DEF\t123\t120.2"],
+            "\t",
+            True,
+            1,
+            None,
+            [
+                (
+                    (
+                        True,
+                        False,
+                        False,
+                        False,
+                        3,
+                        "Lu,Lu,Lu",
+                        "ABC",
+                        False,
+                        "NONE",
+                        "ABC",
+                        False,
+                    ),
+                    (123.0, 1970, 1, 1, 0, 2, 3, 3, 1, 0.0),
+                    (120.2, 1970, 1, 1, 0, 2, 0, 3, 1, 0.20000000000000284),
+                )
+            ],
+        ),
+    ],
+)
+def test_fct__expand_stream(
+    expansion_rules,
+    csv_input,
+    separator,
+    floats_only,
+    maxrecords,
+    hints,
+    expected_output,
+):
+    stream = stream_tuples(
+        input=csv_input,
+        fs=separator,
+        floats_only=floats_only,
+        preload=True,
+        maxrecords=maxrecords,
+    )
+    expanded_stream = expand_stream(
+        generator=stream,
+        rules=expansion_rules,
+        keep_x=True,
+        hints=hints,
+        maxrecords=maxrecords,
+    )
+    assert len(list(expanded_stream)) == len(expected_output)
+    for key, item in enumerate(expanded_stream):
+        print(item)
+        assert item == expected_output[key]

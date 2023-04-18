@@ -46,27 +46,61 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
     discrete_stats.fit(stream())
     discrete_stats.expand_stats()
     histogram = Histogram(
-        peak_threshold=float(HISTOGRAM_PARAMETERS[0]), outlier_threshold=float(HISTOGRAM_PARAMETERS[1])
+        peak_threshold=float(HISTOGRAM_PARAMETERS[0]),
+        outlier_threshold=float(HISTOGRAM_PARAMETERS[1]),
     )
     histogram.fit(stream(), discrete_stats)
     assert histogram.all_counters == (
         (
-            Counter({False: 13, True: 1}), 
-            Counter({False: 14}), 
-            Counter({False: 14}), 
-            Counter({False: 14}), 
-            Counter({7: 13, 3: 1}), 
-            Counter({False: 14}), 
-            Counter({False: 14})
+            Counter({False: 13, True: 1}),
+            Counter({False: 14}),
+            Counter({False: 14}),
+            Counter({False: 14}),
+            Counter({7: 13, 3: 1}),
+            Counter({False: 14}),
+            Counter({False: 14}),
         ),
         (
-            Counter({123: 1, 1593270896: 1, 1593271461: 1, 1593269744: 1, 1593269818: 1, 1593269669: 1, 1593271588: 1, 1593269166: 1, 1593269708: 1, 1593268409: 1, 1593268528: 1, 1593268492: 1, 1593268448: 1, 1593268508: 1}),
+            Counter(
+                {
+                    123: 1,
+                    1593270896: 1,
+                    1593271461: 1,
+                    1593269744: 1,
+                    1593269818: 1,
+                    1593269669: 1,
+                    1593271588: 1,
+                    1593269166: 1,
+                    1593269708: 1,
+                    1593268409: 1,
+                    1593268528: 1,
+                    1593268492: 1,
+                    1593268448: 1,
+                    1593268508: 1,
+                }
+            ),
             Counter({2020: 13, 1970: 1}),
             Counter({6: 13, 1: 1}),
             Counter({27: 13, 1: 1}),
             Counter({14: 10, 15: 3, 0: 1}),
-            Counter({55: 2, 35: 2, 34: 2, 2: 1, 14: 1, 24: 1, 56: 1, 54: 1, 26: 1, 46: 1, 33: 1}),
-            Counter({8: 3, 29: 2, 28: 2, 3: 1, 56: 1, 21: 1, 44: 1, 58: 1, 6: 1, 52: 1}),
+            Counter(
+                {
+                    55: 2,
+                    35: 2,
+                    34: 2,
+                    2: 1,
+                    14: 1,
+                    24: 1,
+                    56: 1,
+                    54: 1,
+                    26: 1,
+                    46: 1,
+                    33: 1,
+                }
+            ),
+            Counter(
+                {8: 3, 29: 2, 28: 2, 3: 1, 56: 1, 21: 1, 44: 1, 58: 1, 6: 1, 52: 1}
+            ),
             Counter({5: 13, 3: 1}),
             Counter({179: 13, 1: 1}),
             Counter({True: 13, False: 1}),
@@ -78,8 +112,8 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
             Counter({1: 11, 0: 3}),
             Counter({False: 11, True: 3}),
             Counter({False: 14}),
-            Counter({8: 6, 6: 2, 9: 2, 3: 1, 1: 1, 4: 1, 2: 1})
-        )
+            Counter({8: 6, 6: 2, 9: 2, 3: 1, 1: 1, 4: 1, 2: 1}),
+        ),
     )
     assert histogram.counters == (
         (
@@ -89,7 +123,7 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
             Counter({False: 14}),
             Counter({7: 13, 3: 1}),
             Counter({False: 14}),
-            Counter({False: 14})
+            Counter({False: 14}),
         ),
         (
             None,
@@ -110,10 +144,10 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
             None,
             None,
             Counter({False: 14}),
-            None
-        )
+            None,
+        ),
     )
     assert histogram.sizes == (
         (14, 14, 14, 14, 14, 14, 14),
-        (14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14)
+        (14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14),
     )

@@ -48,7 +48,9 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
         for item in data_stream_numerical:
             yield item
 
-    cords = Cords(corr_threshold=float(CORDS_PARAMETERS[0]), p=float(CORDS_PARAMETERS[1]))
+    cords = Cords(
+        corr_threshold=float(CORDS_PARAMETERS[0]), p=float(CORDS_PARAMETERS[1])
+    )
     cords.fit(stream())
     for (key1, stats) in enumerate(cords.pearson.stats):
         for (key2, stat) in enumerate(stats):
@@ -96,5 +98,5 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
         ((0, 4), (1, 14)),
         ((0, 4), (1, 15)),
         ((0, 4), (1, 16)),
-        ((0, 4), (1, 18))
+        ((0, 4), (1, 18)),
     ]

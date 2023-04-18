@@ -157,5 +157,5 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
         ((0, 6), (1, 15)),
         ((0, 6), (1, 16)),
         ((0, 6), (1, 17)),
-        ((0, 6), (1, 18))
+        ((0, 6), (1, 18)),
     )

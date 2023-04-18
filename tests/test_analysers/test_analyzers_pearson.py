@@ -43,7 +43,7 @@ def test_cls__pearson__from_parse():
     [
         ([1, 2, 3], [1, 3, 3], -6.062177826491074),
         ([1, 3, 3], [1, 3, 3], -6.1250000000000115),
-    ]
+    ],
 )
 def test_fct__pearson(s1_items, s2_items, expected_output):
     pearson = Pearson(0.5)
@@ -212,6 +212,26 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
     }
     assert pearson.mask == (
         (True, True, True, True, True, True, True),
-        (True,  True,  True,  True,  True,  True,  True,  True,  True,  True,  True,  True,  True,  True,  True, True,  True,  True,  True)
+        (
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+        ),
     )
     assert pearson.hints == [((0, 0), (1, 2)), ((0, 4), (1, 7)), ((0, 4), (1, 8))]

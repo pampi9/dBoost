@@ -40,7 +40,8 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
             yield item
 
     discrete_stats = DiscreteStats(
-        max_buckets=int(DISCRETE_STATS_PARAMETERS[0]), fundep_size=int(DISCRETE_STATS_PARAMETERS[1])
+        max_buckets=int(DISCRETE_STATS_PARAMETERS[0]),
+        fundep_size=int(DISCRETE_STATS_PARAMETERS[1]),
     )
     discrete_stats.fit(stream())
     assert discrete_stats.hints == (
@@ -155,5 +156,5 @@ def test_fct__fit(data_stream_numerical, stats_stream_numerical):
         ((0, 6), (1, 15)),
         ((0, 6), (1, 16)),
         ((0, 6), (1, 17)),
-        ((0, 6), (1, 18))
+        ((0, 6), (1, 18)),
     )

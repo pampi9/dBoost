@@ -1,6 +1,5 @@
 import csv
 import sys
-import time
 
 from .autoconv import autoconv
 from .printing import debug
