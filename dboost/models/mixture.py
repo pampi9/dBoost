@@ -39,7 +39,7 @@ class Mixture:
     def make_gmm(self, to_fit):
         from sklearn import mixture
 
-        gmm = mixture.GMM(n_components=self.n_components)
+        gmm = mixture.GaussianMixture(n_components=self.n_components)
         gmm.fit(to_fit)
         return gmm
 

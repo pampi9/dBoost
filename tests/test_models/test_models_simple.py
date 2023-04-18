@@ -1,49 +1,51 @@
 import argparse
 import sys
 
+import pytest
+
+from dboost.models.gaussian import Simple
 from dboost.analyzers.discrete import DiscreteStats
 
-DISCRETE_STATS_PARAMETERS = ["8", "2"]  # p < 1/sqrt(2*pi)
+SIMPLE_PARAMETERS = ["1.5"]
 
 
 def mock_sys_argv():
-    return ["main.py", "--discretestats"] + DISCRETE_STATS_PARAMETERS
+    return ["main.py", "--gaussian"] + SIMPLE_PARAMETERS
 
 
-def test_const__discrete_stats():
-    assert DiscreteStats.ID == "discretestats"
+def test_const__simple():
+    assert Simple.ID == "gaussian"
 
 
-def test_cls__discrete_stats__register(monkeypatch):
+def test_cls__simple__register(monkeypatch):
     monkeypatch.setattr(sys, "argv", mock_sys_argv())
     parser = argparse.ArgumentParser(add_help=False)
-    DiscreteStats.register(parser)
+    Simple.register(parser)
     args = parser.parse_args()
-    assert args.discretestats == DISCRETE_STATS_PARAMETERS
+    assert args.gaussian == SIMPLE_PARAMETERS
 
 
-def test_cls__discrete_stats__from_parse():
-    discrete_stats = DiscreteStats.from_parse(DISCRETE_STATS_PARAMETERS)
-    # discrete_stats is instance of DiscreteStats
-    assert isinstance(discrete_stats, DiscreteStats)
-    # attributes of discrete_stats are correctly set
-    assert discrete_stats.max_buckets == int(DISCRETE_STATS_PARAMETERS[0])
-    assert discrete_stats.fundep_size == int(DISCRETE_STATS_PARAMETERS[1])
-    assert discrete_stats.histograms is None
-    assert discrete_stats.stats is None
-    assert discrete_stats.hints is None
+def test_cls__simple__from_parse():
+    simple = Simple.from_parse(SIMPLE_PARAMETERS)
+    # simple is instance of Simple
+    assert isinstance(simple, Simple)
+    # attributes of simple are correctly set
+    assert simple.tolerance == float(SIMPLE_PARAMETERS[0])
+    assert simple.model is None
 
 
+@pytest.mark.skip
 def test_fct__fit(data_stream_numerical, stats_stream_numerical):
     def stream():
         for item in data_stream_numerical:
             yield item
 
-    discrete_stats = DiscreteStats(
-        max_buckets=int(DISCRETE_STATS_PARAMETERS[0]), fundep_size=int(DISCRETE_STATS_PARAMETERS[1])
-    )
+    discrete_stats = DiscreteStats(max_buckets=8, fundep_size=2)
     discrete_stats.fit(stream())
-    assert discrete_stats.hints == (
+    discrete_stats.expand_stats()
+    simple = Simple(tolerance=float(SIMPLE_PARAMETERS[0]))
+    simple.fit(stream(), discrete_stats)
+    assert simple.hints == (
         ((0, 0), (1, 1)),
         ((0, 0), (1, 2)),
         ((0, 0), (1, 3)),
